@@ -1,83 +1,75 @@
 /*
-  Blink without Delay
+Un pequeño script que cambia el color de leds como un semáforo.
 
-  Turns on and off a light emitting diode (LED) connected to a digital pin,
-  without using the delay() function. This means that other code can run at the
-  same time without being interrupted by the LED code.
+También tiene conectado un led RGB que se pone morado cuando no hay
+ningún led encendido.
 
-  The circuit:
-  - Use the onboard LED.
-  - Note: Most Arduinos have an on-board LED you can control. On the UNO, MEGA
-    and ZERO it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN
-    is set to the correct LED pin independent of which board is used.
-    If you want to know what pin the on-board LED is connected to on your
-    Arduino model, check the Technical Specs of your board at:
-    https://www.arduino.cc/en/Main/Products
+El circuito tiene puenteado un buzzer que suena en verde para que sea 
+apto para ciegos.
 
-  created 2005
-  by David A. Mellis
-  modified 8 Feb 2010
-  by Paul Stoffregen
-  modified 11 Nov 2013
-  by Scott Fitzgerald
-  modified 9 Jan 2017
-  by Arturo Guadalupi
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/BlinkWithoutDelay
+Cada 500ms lee si el botón está pulsado y con eso cambia el valor.
+Esto también tiene como efecto que si dejamos el botón pulsado,
+los colores cambian cada 500ms, siendo más divertido para el niño :)
 */
 
-// constants won't change. Used here to set a pin number:
 const int ledPin = LED_BUILTIN;  // the number of the LED pin
+
+// inicio el currentPin a 1 para que no se ilumine ningún led
 int currentPin = 1;
 
-// Variables will change:
 int ledState = LOW;  // ledState used to set the LED
 
-// Generally, you should use "unsigned long" for variables that hold time
-// The value will quickly become too large for an int to store
-unsigned long previousMillis = 0;  // will store last time LED was updated
-
-// constants won't change:
-const long interval = 750;  // interval at which to blink (milliseconds)
-
-
+// valores para el led RGB
 int redPin = 8;
 int greenPin = 9;
 int bluePin = 10;
 
-void setup() {  
-  Serial.begin(9600);
-  // set the digital pin as output:
-  pinMode(ledPin, OUTPUT);
+void logicaPrincipal(){
 
+  leerBoton();
+
+  apagarTodasLasLuces();
+
+  cambiarDeColorElLedRGB();
+
+  encenderElPinActivoDelSemaforo();
+
+}
+
+void iniciarSemaforo(){
+  // harcodeados para enterarme de dónde estoy pinchando
   pinMode(6, INPUT);
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+}
 
+void iniciarLedRGB(){
+  // estos son para el led RGB que le gusta a mi hijo
   pinMode(redPin,  OUTPUT);              
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
 }
 
-void loop() {
-  delay(500);
-
+void leerBoton()
+{
   byte buttonState = digitalRead(6);
-  
-    if (buttonState == LOW) {
-      currentPin = currentPin + 1;
-      if(currentPin ==5){
-        currentPin = 1;
-      }
-        Serial.println(currentPin);
-    }
-    else {
-        Serial.println("Button is not pressed");
-    }
+
+  if (buttonState == LOW) {
     
+    currentPin = currentPin + 1;
+    
+    if(currentPin == 5){ // si nos vamos al pin que no es, apagamos.
+      currentPin = 1;
+    }
+
+    Serial.println("Botón pulsado:");
+    Serial.println(currentPin);
+
+  }
+}
+
+void apagarTodasLasLuces(){
     digitalWrite(2, LOW);
     digitalWrite(3, LOW);
     digitalWrite(4, LOW);
@@ -87,14 +79,17 @@ void loop() {
     digitalWrite(bluePin, LOW);
 
     digitalWrite(currentPin, LOW);
-    
-    digitalWrite(currentPin, HIGH);
-    
+}
+
+void encenderElPinActivoDelSemaforo(){
+  digitalWrite(currentPin, HIGH);
+}
+
+void cambiarDeColorElLedRGB(){
     if(currentPin == 2){
       digitalWrite(redPin, HIGH);
     } else if(currentPin == 3){
       digitalWrite(greenPin, HIGH);
-      analogWrite(currentPin, 10);
     } else if(currentPin == 4){
       digitalWrite(bluePin, HIGH);
     } else {
@@ -106,7 +101,23 @@ void loop() {
       digitalWrite(redPin, HIGH);
       digitalWrite(bluePin, HIGH);
     }
+}
 
-    digitalWrite(currentPin, HIGH);
+void setup() {  
+  // Para enviar mensajes de log
+  Serial.begin(9600);
 
+  // set the digital pin as output:
+  pinMode(ledPin, OUTPUT);
+
+  iniciarSemaforo();
+
+  iniciarLedRGB();
+}
+
+void loop() {
+  delay(500);
+
+  logicaPrincipal();
+  
 }
