@@ -42,6 +42,11 @@ unsigned long previousMillis = 0;  // will store last time LED was updated
 // constants won't change:
 const long interval = 750;  // interval at which to blink (milliseconds)
 
+
+int redPin = 8;
+int greenPin = 9;
+int bluePin = 10;
+
 void setup() {  
   Serial.begin(9600);
   // set the digital pin as output:
@@ -51,6 +56,10 @@ void setup() {
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+
+  pinMode(redPin,  OUTPUT);              
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
 }
 
 void loop() {
@@ -72,8 +81,32 @@ void loop() {
     digitalWrite(2, LOW);
     digitalWrite(3, LOW);
     digitalWrite(4, LOW);
+    
+    digitalWrite(redPin, LOW);
+    digitalWrite(greenPin, LOW);
+    digitalWrite(bluePin, LOW);
+
     digitalWrite(currentPin, LOW);
     
+    digitalWrite(currentPin, HIGH);
+    
+    if(currentPin == 2){
+      digitalWrite(redPin, HIGH);
+    } else if(currentPin == 3){
+      digitalWrite(greenPin, HIGH);
+      analogWrite(currentPin, 10);
+    } else if(currentPin == 4){
+      digitalWrite(bluePin, HIGH);
+    } else {
+        
+      digitalWrite(redPin, LOW);
+      digitalWrite(greenPin, LOW);
+      digitalWrite(bluePin, LOW);
+
+      digitalWrite(redPin, HIGH);
+      digitalWrite(bluePin, HIGH);
+    }
+
     digitalWrite(currentPin, HIGH);
 
 }
